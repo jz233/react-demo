@@ -155,10 +155,10 @@ class Clock extends React.Component{
   };
 }
 
-ReactDOM.render(
-  <Clock />,
-  document.getElementById('root')
-);
+// ReactDOM.render(
+//   <Clock />,
+//   document.getElementById('root')
+// );
 
 // function tick(){
 //   ReactDOM.render(
@@ -174,3 +174,65 @@ ReactDOM.render(
       Handling Events
   ################################################
 */
+class Toggle extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      isToggleOn: true,
+    };
+    // This binding is necessary to make `this` work in the callback
+    // 会报错 Cannot read property 'setState' of undefined
+    // Generally, if you refer to a method without () after it, such as onClick={this.handleClick}, you should bind that method.
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(){
+    this.setState(preState => ({
+      isToggleOn: !preState.isToggleOn
+    }));
+  }
+
+  render(){
+    return(
+      <button onClick={this.handleClick}>
+        {this.state.isToggleOn ? 'ON' : 'OFF'}
+      </button>
+    );
+  }
+}
+
+class LoggingButton extends React.Component {
+  handleClick = () => {
+    console.log('this is: ' + this);
+  };
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>
+        click
+      </button>
+    );
+  }
+
+/*
+  The problem with this syntax is that a different callback is created each time the LoggingButton renders. In most cases, this is fine.
+  However, if this callback is passed as a prop to lower components, those components might do an extra re-rendering.
+  We generally recommend binding in the constructor or using the class fields syntax, to avoid this sort of performance problem.
+*/
+  // handleClick() {
+  //   console.log('this is: ' + this);
+  // };
+  //
+  // render() {
+  //   return (
+  //     <button onClick={(e) => this.handleClick(e)}>
+  //       click
+  //     </button>
+  //   );
+  // }
+}
+
+ReactDOM.render(
+  <LoggingButton />,
+  document.getElementById('root')
+);
