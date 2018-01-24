@@ -424,10 +424,10 @@ function NumberList(props) {
 }
 
 const numbers = [1, 2, 3, 4, 5];
-ReactDOM.render(
-  <NumberList numbers={numbers} />,
-  document.getElementById('root')
-);
+// ReactDOM.render(
+//   <NumberList numbers={numbers} />,
+//   document.getElementById('root')
+// );
 
 function Blog(props){
   const sidebar = (
@@ -658,17 +658,136 @@ class Reservation extends React.Component{
   }
 }
 
+// ReactDOM.render(
+//   <Reservation />,
+//   document.getElementById('root')
+// );
+
+// ReactDOM.render(
+//   <input value="hi" />, document.getElementById('other')
+// );
+// setTimeout(function(){
+//   ReactDOM.render(<input value={null} />, document.getElementById('other'));
+// }, 1000);
+
+/*
+  ################################################
+      Lifting State Up
+  ################################################
+*/
+function BoilingVerdict(props){
+  if (props.celsius >= 100) {
+    return <p>The water would boil.</p>;
+  }
+  return <p>The water would not boil.</p>;
+}
+
+const scaleNames = {
+  c: 'Celsius',
+  f: 'Fahrenheit'
+};
+
+class TemperatureInput extends React.Component {
+  constructor(props){
+    super(props);
+    //this.state = {temperature: ''};
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(event) {
+    // this.setState({
+    //   temperature: event.target.value
+    // });
+    this.props.onTemperatureChange(event.target.value);
+  }
+
+  render() {
+    const temperature = this.props.temperature;
+    const scale = this.props.scale;
+    return(
+      <fieldset>
+        <legend>Enter Temperature in {scaleNames[scale]}: </legend>
+        <input
+          value={temperature}
+          onChange={this.handleChange}
+        />
+      </fieldset>
+    );
+  }
+}
+
+class Calculator extends React.Component{
+  constructor(props) {
+    super(props);
+    this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
+    this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
+    this.state = {
+      scale: 'c',
+      temperature: ''
+    }
+  }
+  handleCelsiusChange(temperature){
+    this.setState({scale:'c', temperature});
+  }
+  handleFahrenheitChange(temperature){
+    this.setState({scale:'f', temperature});
+  }
+
+  render(){
+    const temperature = this.state.temperature;
+    const scale = this.state.scale;
+
+    const celsius = scale === 'c'? temperature: tryConvert(temperature, toCelsius);
+    const fahrenheit = scale === 'f'? temperature: tryConvert(temperature, toFahrenheit);
+
+    return(
+      <div>
+        <TemperatureInput
+          temperature={celsius}
+          scale="c"
+          onTemperatureChange={this.handleCelsiusChange}
+        />
+        <TemperatureInput
+          temperature={fahrenheit}
+          scale="f"
+          onTemperatureChange={this.handleFahrenheitChange}
+        />
+        <BoilingVerdict
+          celsius={celsius}
+        />
+      </div>
+    );
+  }
+}
+// 摄氏度华氏度转换方法
+function toCelsius(fahrenheit) {
+  return (fahrenheit - 32) * 5 / 9;
+}
+
+function toFahrenheit(celsius) {
+  return (celsius * 9 / 5) + 32;
+}
+
+function tryConvert(temperature, convert){
+  const input = parseFloat(temperature);
+  if(Number.isNaN(input)){
+    return '';
+  }
+  const output = convert(input);
+  const rounded = Math.round(output*1000)/1000;
+  return rounded.toString();
+}
+
+
+
+
 ReactDOM.render(
-  <Reservation />,
+  <Calculator />,
   document.getElementById('root')
 );
 
-ReactDOM.render(
-  <input value="hi" />, document.getElementById('other')
-);
-setTimeout(function(){
-  ReactDOM.render(<input value={null} />, document.getElementById('other'));
-}, 1000);
+
+
+
 
 
 
